@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ship It · 我的第一个上线 Demo</title>
+<style>
+  :root { --bg:#0b0f17; --card:#131a26; --text:#e8edf5; --muted:#8b96ab; --accent:#5eead4; --border:#232d42; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; line-height:1.7; }
+  .wrap { max-width:720px; margin:0 auto; padding:48px 24px 80px; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:56px; }
+  .logo { font-weight:800; letter-spacing:.5px; }
+  .logo span { color:var(--accent); }
+  .badge { font-size:12px; color:var(--muted); border:1px solid var(--border); padding:4px 12px; border-radius:999px; }
+  h1 { font-size:40px; line-height:1.3; margin-bottom:16px; }
+  h1 span { color:var(--accent); }
+  .sub { color:var(--muted); font-size:17px; margin-bottom:48px; }
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:48px; }
+  .step { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 16px; }
+  .step .n { font-size:12px; color:var(--accent); font-weight:700; margin-bottom:8px; }
+  .step h3 { font-size:15px; margin-bottom:6px; }
+  .step p { font-size:13px; color:var(--muted); }
+  .checklist { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; }
+  .checklist h2 { font-size:18px; margin-bottom:16px; }
+  .item { display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-top:1px solid var(--border); cursor:pointer; font-size:15px; }
+  .item:first-of-type { border-top:none; }
+  .item input { margin-top:6px; accent-color:var(--accent); width:16px; height:16px; flex:none; }
+  .item.done label { text-decoration:line-through; color:var(--muted); }
+  .progress { margin-top:16px; font-size:13px; color:var(--muted); }
+  .bar { height:6px; background:var(--border); border-radius:999px; margin-top:8px; overflow:hidden; }
+  .bar i { display:block; height:100%; width:0; background:var(--accent); border-radius:999px; transition:width .3s; }
+  footer { margin-top:56px; color:var(--muted); font-size:13px; text-align:center; }
+  #clock { font-variant-numeric:tabular-nums; }
+  @media (max-width:560px){ .steps{grid-template-columns:1fr;} h1{font-size:30px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">SHIP<span>IT</span></div>
+    <div class="badge">Demo v0.1 · <span id="clock"></span></div>
+  </header>
+
+  <h1>从代码到线上，<span>一次跑通。</span></h1>
+  <p class="sub">这是一个最小可上线的静态页面。把它推到 GitHub，再用 Vercel 一键部署——「全栈交付上线」目标的第一次完整交付，就从这里开始。</p>
+
+  <div class="steps">
+    <div class="step"><div class="n">STEP 1</div><h3>写代码</h3><p>本地就是这个页面，改完即所见。</p></div>
+    <div class="step"><div class="n">STEP 2</div><h3>推仓库</h3><p>git push 到 GitHub，版本有记录。</p></div>
+    <div class="step"><div class="n">STEP 3</div><h3>发线上</h3><p>Vercel 导入仓库，自动构建上线。</p></div>
+  </div>
+
+  <div class="checklist">
+    <h2>上线检查清单</h2>
+    <div id="list"></div>
+    <div class="progress"><span id="pct">0%</span> 完成</div>
+    <div class="bar"><i id="fill"></i></div>
+  </div>
+
+  <footer>全栈交付上线 · 第一个里程碑进行中</footer>
+</div>
+<script>
+  const items = ["本地页面可正常打开", "初始化 git 仓库并提交", "推送到 GitHub", "Vercel 导入仓库并部署", "线上地址可公开访问"];
+  const key = "shipit-checklist-v1";
+  let state = JSON.parse(localStorage.getItem(key) || "[]");
+  const list = document.getElementById("list");
+  function render() {
+    list.innerHTML = "";
+    items.forEach((t, i) => {
+      const div = document.createElement("div");
+      div.className = "item" + (state[i] ? " done" : "");
+      div.innerHTML = `<input type="checkbox" ${state[i] ? "checked" : ""} id="c${i}"><label for="c${i}">${t}</label>`;
+      div.querySelector("input").addEventListener("change", e => {
+        state[i] = e.target.checked;
+        localStorage.setItem(key, JSON.stringify(state));
+        render();
+      });
+      list.appendChild(div);
+    });
+    const done = state.filter(Boolean).length;
+    const pct = Math.round(done / items.length * 100);
+    document.getElementById("pct").textContent = pct + "%";
+    document.getElementById("fill").style.width = pct + "%";
+  }
+  render();
+  setInterval(() => {
+    document.getElementById("clock").textContent =
+      new Date().toLocaleString("zh-CN", { hour12: false });
+  }, 1000);
+</script>
+</body>
+</html>
